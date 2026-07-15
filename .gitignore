@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Training artifacts
+checkpoints/
+datasets/tokens/
+datasets/raw/**/*.txt
+datasets/raw/**/*.jsonl
+!datasets/raw/.gitkeep
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Virtual environments
+venv/
+.venv/
+.env
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Large files
+*.bin
+*.npy
+*.safetensors
+*.pth
+*.pt

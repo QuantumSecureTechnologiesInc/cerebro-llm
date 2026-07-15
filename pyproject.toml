@@ -1,0 +1,59 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cerebro"
+version = "1.1.0"
+description = "Cerebro: Cognitive Entropic Reasoning Engine with Bounded Recursive Optimization"
+requires-python = ">=3.10"
+license = {text = "Proprietary"}
+dependencies = [
+    "torch>=2.3",
+    "numpy>=1.24",
+    "tiktoken>=0.7",
+    "safetensors>=0.4",
+    "tqdm>=4.65",
+    "fastapi>=0.110",
+    "uvicorn[standard]>=0.29",
+    "pydantic>=2.0",
+    "requests>=2.31",
+    "aiohttp>=3.9",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "pytest-asyncio>=0.23",
+]
+benchmarks = [
+    "datasets>=2.14",
+]
+rag = [
+    "sentence-transformers>=2.2",
+    "faiss-cpu>=1.7; platform_system != 'Darwin'",
+    "chromadb>=0.4",
+]
+security = [
+    "cryptography>=42.0",
+]
+server = [
+    "fastapi>=0.110",
+    "uvicorn[standard]>=0.29",
+    "pydantic>=2.0",
+]
+all = [
+    "cerebro[dev,security,server,benchmarks,rag]",
+]
+
+[project.scripts]
+cerebro = "cerebro.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["cerebro*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

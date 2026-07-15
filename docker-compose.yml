@@ -1,0 +1,75 @@
+version: "3.9"
+
+services:
+  # Cerebro API server
+  cerebro-api:
+    build:
+      context: .
+      target: base
+    image: cerebro:latest
+    container_name: cerebro-api
+    ports:
+      - "8000:8000"
+    environment:
+      - CEREBRO_MODEL=nano
+      - CEREBRO_API_KEYS=${CEREBRO_API_KEYS:-}
+    volumes:
+      - ./checkpoints:/app/checkpoints:ro
+      - cerebro-logs:/app/logs
+    restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # Cerebro training job (run on demand)
+  cerebro-train:
+    build:
+      context: .
+      target: training
+    image: cerebro:training
+    container_name: cerebro-train
+    profiles: ["training"]
+    environment:
+      - CEREBRO_MODEL=nano
+      - WANDB_API_KEY=${WANDB_API_KEY:-}
+    volumes:
+      - ./checkpoints:/app/checkpoints
+      - ./data:/app/data
+      - cerebro-logs:/app/logs
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    command: >
+      train --config nano --data /app/data
+      --output /app/checkpoints
+      --epochs 3
+
+  # Cerebro evaluation (run on demand)
+  cerebro-eval:
+    build:
+      context: .
+      target: base
+    image: cerebro:latest
+    container_name: cerebro-eval
+    profiles: ["eval"]
+    volumes:
+      - ./checkpoints:/app/checkpoints:ro
+    command: >
+      benchmark --config nano --seq-len 512
+
+volumes:
+  cerebro-logs:

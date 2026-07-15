@@ -1,0 +1,308 @@
+"""Curated HuggingFace dataset catalog for Cerebro training.
+
+Provides a dictionary of popular training datasets with metadata
+for easy discovery and download.
+"""
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+
+
+@dataclass
+class HFDataset:
+    """Metadata for a HuggingFace dataset."""
+    hf_id: str
+    name: str
+    category: str
+    description: str
+    size: str
+    license: str
+    text_field: str = "text"
+    subset: str | None = None
+    notes: str = ""
+
+    def display(self) -> str:
+        """Human-readable display string."""
+        lines = [
+            f"{self.name} ({self.category})",
+            f"  HF ID: {self.hf_id}",
+            f"  Size: {self.size}",
+            f"  License: {self.license}",
+            f"  {self.description}",
+        ]
+        if self.notes:
+            lines.append(f"  Note: {self.notes}")
+        return "\n".join(lines)
+
+
+# Curated catalog of popular training datasets
+HF_CATALOG: dict[str, HFDataset] = {
+    # General text corpora
+    "c4": HFDataset(
+        hf_id="allenai/c4",
+        name="C4 (Colossal Clean Crawled Corpus)",
+        category="General Text",
+        description="A cleaned version of Common Crawl, used to train T5 and many other models.",
+        size="~750GB",
+        license="ODC-By 1.0",
+        subset="en",
+    ),
+    "pile": HFDataset(
+        hf_id="monology/pile-uncopyrighted",
+        name="The Pile (Uncopyrighted)",
+        category="General Text",
+        description="825GB diverse text corpus from 22 sources. Uncopyrighted subset.",
+        size="~300GB",
+        license="MIT",
+    ),
+    "redpajama": HFDataset(
+        hf_id="cerebras/SlimPajama-627B",
+        name="SlimPajama",
+        category="General Text",
+        description="627B token cleaned version of RedPajama. High-quality web text.",
+        size="~895GB",
+        license="Apache 2.0",
+    ),
+    "dolma": HFDataset(
+        hf_id="allenai/dolma",
+        name="DOLMA",
+        category="General Text",
+        description="3+ trillion token dataset used to train OLMo. Diverse web text.",
+        size="~3TB",
+        license="AI2 ImpACT License",
+        subset="v1_5-preview",
+    ),
+    "fineweb": HFDataset(
+        hf_id="HuggingFaceFW/fineweb",
+        name="FineWeb",
+        category="General Text",
+        description="15T token high-quality web corpus with deduplication.",
+        size="~5TB",
+        license="ODC-By 1.0",
+        subset="sample-10BT",
+        notes="Use sample-10BT for testing, full dataset for production training.",
+    ),
+    "fineweb-edu": HFDataset(
+        hf_id="HuggingFaceFW/fineweb-edu",
+        name="FineWeb-Edu",
+        category="General Text",
+        description="Massive collection of high-quality educational web pages filtered specifically for LLM learning.",
+        size="~1.3TB",
+        license="ODC-By 1.0",
+        subset="sample-10BT",
+        notes="Educational subset of FineWeb. Best for knowledge-heavy pretraining.",
+    ),
+    "wikipedia": HFDataset(
+        hf_id="wikimedia/wikipedia",
+        name="Wikipedia",
+        category="General Text",
+        description="Cleaned, multi-lingual text from all of Wikipedia. 20231101 snapshot.",
+        size="~20GB",
+        license="CC-BY-SA 3.0",
+        subset="20231101.en",
+        notes="Use language subsets (e.g. 20231101.en). Essential for factual knowledge.",
+    ),
+
+    # Code datasets
+    "starcoderdata": HFDataset(
+        hf_id="bigcode/starcoderdata",
+        name="StarCoder Data",
+        category="Code",
+        description="1T token code dataset in 80+ programming languages.",
+        size="~1TB",
+        license="BigCode Open RAIL-M",
+        text_field="content",
+    ),
+    "codeparrot": HFDataset(
+        hf_id="codeparrot/codeparrot-clean",
+        name="CodeParrot Clean",
+        category="Code",
+        description="Cleaned code dataset in multiple programming languages for code generation.",
+        size="~180GB",
+        license="MIT",
+        text_field="content",
+    ),
+    "the-stack": HFDataset(
+        hf_id="bigcode/the-stack",
+        name="The Stack v1",
+        category="Code",
+        description="6.4TB code dataset in 30+ programming languages.",
+        size="~6.4TB",
+        license="BigCode Open RAIL-M",
+        text_field="content",
+        subset="data",
+    ),
+    "the-stack-v2": HFDataset(
+        hf_id="bigcode/the-stack-v2",
+        name="The Stack v2",
+        category="Code",
+        description="Billions of lines of high-quality code across 600+ programming languages. Successor to The Stack v1.",
+        size="~67TB",
+        license="BigCode Open RAIL-M",
+        text_field="content",
+        notes="Massive upgrade from v1. Supports streaming for memory-efficient loading.",
+    ),
+
+    # Instruction/chat datasets
+    "alpaca": HFDataset(
+        hf_id="tatsu-lab/alpaca",
+        name="Alpaca",
+        category="Instruction/Chat",
+        description="52K instruction-following examples generated by GPT-3.5.",
+        size="~50MB",
+        license="CC-BY-NC 4.0",
+        notes="Format: instruction + input -> output. Good for SFT fine-tuning.",
+    ),
+    "oasst1": HFDataset(
+        hf_id="OpenAssistant/oasst1",
+        name="OpenAssistant Conversations",
+        category="Instruction/Chat",
+        description="161K human-generated conversations with rankings.",
+        size="~200MB",
+        license="Apache 2.0",
+        text_field="text",
+    ),
+    "ultrachat": HFDataset(
+        hf_id="HuggingFaceH4/ultrachat_200k",
+        name="UltraChat 200k",
+        category="Instruction/Chat",
+        description="200K multi-turn conversations for instruction tuning.",
+        size="~400MB",
+        license="MIT",
+    ),
+    "slimorca": HFDataset(
+        hf_id="Open-Orca/SlimOrca-Dedup",
+        name="SlimOrca",
+        category="Instruction/Chat",
+        description="518K deduplicated instruction-response pairs.",
+        size="~800MB",
+        license="Apache 2.0",
+    ),
+    "lmsys-chat": HFDataset(
+        hf_id="lmsys/lmsys-chat-1m",
+        name="LMSYS-Chat-1M",
+        category="Instruction/Chat",
+        description="1 million real conversations between humans and 25+ leading AI models. Includes Elo ratings.",
+        size="~2GB",
+        license="CC-BY 4.0",
+        text_field="conversation",
+        notes="Excellent for chat fine-tuning. Contains conversation trees with model comparisons.",
+    ),
+    "openhermes": HFDataset(
+        hf_id="teknium/OpenHermes-2.5",
+        name="OpenHermes-2.5",
+        category="Instruction/Chat",
+        description="1M+ diverse chat tasks covering coding, math, logic puzzles, roleplay, and general Q&A.",
+        size="~1GB",
+        license="Apache 2.0",
+        text_field="conversations",
+        notes="Widely used for SFT. Conversations field contains JSON role/content pairs.",
+    ),
+
+    # Science/Math
+    "pes2o": HFDataset(
+        hf_id="allenai/peS2o",
+        name="peS2o (Pretraining English Semantic Scholar)",
+        category="Science",
+        description="Academic papers from Semantic Scholar, filtered for quality.",
+        size="~38GB",
+        license="ODC-By 1.0",
+    ),
+    "automathtext": HFDataset(
+        hf_id="EleutherAI/auto_math_text",
+        name="AutoMathText",
+        category="Math",
+        description="Mathematical text from arXiv, OpenWebMath, and AlgebraicStack.",
+        size="~200GB",
+        license="Various",
+    ),
+
+    # Books
+    "pg19": HFDataset(
+        hf_id="pg19",
+        name="PG-19 (Project Gutenberg)",
+        category="Books",
+        description="19K books from Project Gutenberg. Long-context benchmark.",
+        size="~11GB",
+        license="Public Domain",
+    ),
+    "proofpile-algebra": HFDataset(
+        hf_id="EleutherAI/proofpile-algebra",
+        name="ProofPile-Algebra",
+        category="Math/Books",
+        description="Long-form mathematical text with algebraic reasoning.",
+        size="~30GB",
+        license="Various",
+    ),
+}
+
+
+def list_datasets(category: str | None = None) -> list[HFDataset]:
+    """List available datasets, optionally filtered by category.
+    
+    Args:
+        category: Filter by category (e.g., "General Text", "Code", "Instruction/Chat").
+        
+    Returns:
+        List of HFDataset objects.
+    """
+    datasets = list(HF_CATALOG.values())
+    if category:
+        datasets = [d for d in datasets if d.category.lower() == category.lower()]
+    return datasets
+
+
+def get_dataset(name: str) -> HFDataset | None:
+    """Get a dataset by name or HF ID.
+    
+    Args:
+        name: Dataset name or HuggingFace ID.
+        
+    Returns:
+        HFDataset or None if not found.
+    """
+    name_lower = name.lower()
+    
+    # Direct catalog lookup
+    if name_lower in HF_CATALOG:
+        return HF_CATALOG[name_lower]
+    
+    # Search by HF ID
+    for ds in HF_CATALOG.values():
+        if ds.hf_id.lower() == name_lower:
+            return ds
+    
+    # Fuzzy match on name
+    for ds in HF_CATALOG.values():
+        if name_lower in ds.name.lower():
+            return ds
+    
+    return None
+
+
+def print_catalog(category: str | None = None) -> None:
+    """Print the dataset catalog in a readable format.
+    
+    Args:
+        category: Optional category filter.
+    """
+    datasets = list_datasets(category)
+    
+    print("\n" + "=" * 70)
+    print("CEREBRO TRAINING DATASET CATALOG")
+    print("=" * 70)
+    
+    current_category = None
+    for ds in datasets:
+        if ds.category != current_category:
+            current_category = ds.category
+            print(f"\n[{current_category}]")
+            print("-" * 70)
+        
+        print(ds.display())
+        print()
+    
+    print("=" * 70)
+    print(f"Total: {len(datasets)} datasets")
+    print("=" * 70 + "\n")
